@@ -48,6 +48,7 @@ int main()
         cout << "16. Pesquisar todas diretorias com nome\n";
         cout << "17. Pesquisar todos ficheiros com nome\n";
         cout << "18. Renomear ficheiros\n";
+        cout << "19. Verificar ficheiros duplicados\n";
         cout << "0. Sair\n";
         cout << "Escolha uma opcao: ";
         cin >> opcao;
@@ -282,6 +283,19 @@ int main()
                 getline(cin, newName);
                 sf.RenomearFicheiros(oldName, newName);
                 cout << "Renomeacao concluida." << endl;
+                break;
+            }
+            case 19:
+            {
+                bool duplicados = sf.FicheiroDuplicados();
+                if(duplicados)
+                {
+                    cout << "Existem ficheiros duplicados." << endl;
+                }
+                else
+                {
+                    cout << "Nao existem ficheiros duplicados." << endl;
+                }
                 break;
             }
             case 0:
