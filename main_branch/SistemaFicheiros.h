@@ -7,6 +7,7 @@ using namespace std;
 #include <string>
 #include <fstream>
 #include <iomanip> // para o "put_time"
+#include <set>
 #include <sstream>
 
 class Entrada;
@@ -38,6 +39,7 @@ class SistemaFicheiros
         void PesquisarAllDirectoriasAux(Entrada *entrada, const string &nome, list<string> &res);
         void PesquisarAllFicheirosAux(Entrada *entrada, const string &nome, list<string> &res);
         void RenomearFicheirosAux(Entrada *entrada, const string &fich_old, const string &fich_new);
+        bool FicheiroDuplicadosAux(Entrada *entrada, std::set<string> &nomesFicheiros);
         
 	public:
 		SistemaFicheiros();

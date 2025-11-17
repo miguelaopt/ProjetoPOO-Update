@@ -5,6 +5,7 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <set>
 using namespace std;
 namespace fs = std::filesystem;
 
@@ -964,4 +965,36 @@ void SistemaFicheiros::RenomearFicheiros(const string &fich_old, const string &f
 {
     for (Entrada *e : Entradas)
         RenomearFicheirosAux(e, fich_old, fich_new);
+}
+
+bool SistemaFicheiros::FicheiroDuplicadosAux(Entrada *entrada, set<string> &nomesFicheiros)
+{
+    if (!entrada) return false;
+
+    if (!entrada->isDirectoria()){
+        string nome = entrada->getNome();
+        auto [iterador, sucesso] = nomesFicheiros.insert(nome);
+        if (!sucesso) return true; 
+    }
+    else
+    {
+        Directoria *dir = (Directoria*)entrada;
+        for (Entrada *e : dir->getConteudo())
+        {
+            if (FicheiroDuplicadosAux(e, nomesFicheiros))
+                return true; 
+        }
+    }
+    return false;
+}
+
+bool SistemaFicheiros::FicheiroDuplicados()
+{
+    std::set<string> nomesFicheiros;
+    for (Entrada *e : Entradas)
+    {
+        if (FicheiroDuplicadosAux(e, nomesFicheiros))
+            return true; 
+    }
+    return false;
 }
