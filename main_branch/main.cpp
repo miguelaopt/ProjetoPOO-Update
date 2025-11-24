@@ -49,6 +49,7 @@ int main()
         cout << "17. Pesquisar todos ficheiros com nome\n";
         cout << "18. Renomear ficheiros\n";
         cout << "19. Verificar ficheiros duplicados\n";
+        cout << "20. Copiar ficheiros em batch\n";
         cout << "0. Sair\n";
         cout << "Escolha uma opcao: ";
         cin >> opcao;
@@ -295,6 +296,26 @@ int main()
                 else
                 {
                     cout << "Nao existem ficheiros duplicados." << endl;
+                }
+                break;
+            }
+            case 20:
+            {
+                string padrao, dirOrigem, dirDestino;
+                
+                cout << "Digite o texto (padrao) a procurar no nome dos ficheiros: ";
+                getline(cin, padrao);
+                
+                cout << "Digite o nome da diretoria de origem: ";
+                getline(cin, dirOrigem);
+                
+                cout << "Digite o nome da diretoria de destino: ";
+                getline(cin, dirDestino);
+                bool sucesso = sf.CopyBatch(padrao, dirOrigem, dirDestino);
+                
+                if(!sucesso)
+                {
+                    cout << "Operacao de copia falhou ou nao foram encontrados ficheiros." << endl;
                 }
                 break;
             }

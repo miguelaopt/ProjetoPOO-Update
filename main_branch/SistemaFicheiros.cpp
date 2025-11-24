@@ -6,6 +6,10 @@
 #include <chrono>
 #include <ctime>
 #include <set>
+#include <functional>
+#include <sstream>
+#include <iomanip>
+
 using namespace std;
 namespace fs = std::filesystem;
 
@@ -997,4 +1001,108 @@ bool SistemaFicheiros::FicheiroDuplicados()
             return true; 
     }
     return false;
+}
+
+bool SistemaFicheiros::CopyBatch(const string &padrao, const string &DirOrigem, const string &DirDestino)
+{
+    if (Entradas.empty()) return false;
+
+    Directoria* raiz = (Directoria*)Entradas.front();
+
+    Directoria* origem = ProcurarDirectoria(raiz, DirOrigem);
+    Directoria* destino = ProcurarDirectoria(raiz, DirDestino);
+
+    if (!origem || !destino)
+    {
+        cout << "Erro: Diretoria de origem ou destino nao encontrada." << endl;
+        return false;
+    }
+    if (origem == destino)
+    {
+        cout << "Erro: Origem e destino sao a mesma diretoria." << endl;
+        return false;
+    }
+    list<Ficheiro*> candidatos;
+
+    function<void(Directoria*)> recolherCandidatos = [&](Directoria* dir) {
+        for (Entrada* e : dir->getConteudo())
+        {
+            if (e->isDirectoria())
+            {
+                recolherCandidatos((Directoria*)e);
+            }
+            else
+            {
+                // Verifica se o nome contém o padrão (substring)
+                if (e->getNome().find(padrao) != string::npos)
+                {
+                    candidatos.push_back((Ficheiro*)e);
+                }
+            }
+        }
+    };
+
+    recolherCandidatos(origem);
+
+    if (candidatos.empty())
+    {
+        cout << "Nenhum ficheiro encontrado com o padrao '" << padrao << "'." << endl;
+        return false;
+    }
+
+    int copiados = 0;
+    for (Ficheiro* f : candidatos)
+    {
+        string nomeFinal = f->getNome();
+        string nomeBase = nomeFinal;
+        string extensao = "";
+
+        size_t ponto = nomeFinal.rfind('.');
+        if (ponto != string::npos)
+        {
+            nomeBase = nomeFinal.substr(0, ponto);
+            extensao = nomeFinal.substr(ponto);
+        }
+        int contador = 1;
+        bool nomeValido = false;
+
+        while (!nomeValido)
+        {
+            bool existe = false;
+            for (Entrada* e : destino->getConteudo())
+            {
+                if (!e->isDirectoria() && e->getNome() == nomeFinal)
+                {
+                    existe = true;
+                    break;
+                }
+            }
+
+            if (!existe)
+            {
+                nomeValido = true;
+            }
+            else
+            {
+                stringstream ss;
+                ss << nomeBase << setfill('0') << setw(3) << contador << extensao;
+                nomeFinal = ss.str();
+                contador++;
+            }
+        }
+
+        string novoCaminho = destino->getCaminho();
+        if (!novoCaminho.empty() && novoCaminho.back() != '/' && novoCaminho.back() != '\\') {
+             novoCaminho += "/";
+        }
+        novoCaminho += nomeFinal;
+
+        Ficheiro* novaCopia = new Ficheiro(nomeFinal, novoCaminho, f->getTamanho(), f->getData(), this);
+        
+        destino->adicionarEntrada(novaCopia);
+        copiados++;
+    }
+
+    cout << "Foram copiados " << copiados << " ficheiros com sucesso." << endl;
+    return true;
 }

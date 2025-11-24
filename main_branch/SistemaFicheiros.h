@@ -64,8 +64,8 @@ class SistemaFicheiros
         void PesquisarAllFicheiros(list<string> &lres, const string &file);
         void RenomearFicheiros(const string &fich_old, const string &fich_new);
         bool FicheiroDuplicados();
-        bool CopyBatch(const string &padrao, const string &DirOrigem, const string &DirDestino);
         void MostrarConteudo(Directoria* dir, int nivel = 0);
+        bool CopyBatch(const string &padrao, const string &DirOrigem, const string &DirDestino);
 };
 
 #endif
